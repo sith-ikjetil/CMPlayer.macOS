@@ -1,15 +1,6 @@
 # CMPlayer.Linux
 License: **GPL-3.0-or-later**  
-This is a console music player for Linux.  
-
-### Ubuntu 26-04 
-<img src="https://www.ikjetil.no/content/images/CMPlayerOnUbuntu26-04.png" alt="CMPlayer.Linux" style="width:50%">
- 
-### Ubuntu 24-04 
-<img src="https://www.ikjetil.no/content/images/CMPlayerUbuntuWSL2.png" alt="CMPlayer.Linux" style="width:50%">  
- 
-### Ubuntu 24-04 
-<img src="https://www.ikjetil.no/content/images/CMPlayerUbuntuWSL.png" alt="CMPlayer.Linux" style="width:70%;">  
+This is a console music player for macOS.  
 
 ## Application
 The applications name is **cmplayer** and the following arguments are supported:  
@@ -52,61 +43,17 @@ The player uses the following tools and libraries:
  - Swift (version 5.10.1+)
  - libmpg123 (libmpg123.so)
  - ffmpeg
- - libao (libao.so)
- - libasound (libasound.so)
  - libavcodec (libavcodec.so)
  - libavformat (libavformat.so)
  - libavutil (libavutil.so)
   
-## Ubuntu
+## macOS
 In order to get these libraries onto your Ubuntu distro, you can execute the following commands:  
  - sudo apt install ffmpeg
  - sudo apt install libavcodec-dev
  - sudo apt install libavformat-dev
  - sudo apt install libmpg123-dev
- - sudo apt isntall libasound-dev
- - sudo apt install libao-dev
- - On WSL: sudo apt install pulseaudio (can be helpful, but doesn't always work)
    
-## Fedora
-In order to get these libraries onto you Fedora distro, you can execute the following commands:  
- - sudo dnf install ffmpeg
- - sudo dnf install --allowerasing libavcodec-free-devel
- - sudo dnf install --allowerasing libavformat-free-devel
- - sudo dnf install --allowerasing libswresample-free-devel
- - sudo dnf install libmpg123-devel
- - sudo dnf install alsa-lib-devel
- - sudo dnf install libao-devel
-
-## Manjaro
-In order to get these libraries onto you Manjaro distro, you can execute the following commands:  
- - sudo pacman -Syu libao
- - sudo pacman -Syu alsa-lib
- - sudo pacman -Syu mpg123
-   
-## C_INCLUDE_PATH
-### Fedora
-Remember to set the C_INCLUDE_PATH for ffmpeg headers:  
-```bash
-export C_INCLUDE_PATH=/usr/include/ffmpeg:$C_INCLUDE_PATH  
-```
-  
-## LD_LIBRARY_PATH
-After installing Swift, remember to update LD_LIBRARY_PATH. Set the following  
-into your .bashrc and .bash_profile.  
-```bash
-export LD_LIBRARY_PATH=/opt/swift-5.10.1/usr/lib/swift/linux:$LD_LIBRARY_PATH  
-```
-(the path is of course up to you where you put swift)  
-  
-## PATH
-You must put swift binaries in you path. An example would be to put them into your .bashrc  
-and .bash_profile using the following:  
-```bash
-PATH=/opt/swift-5.10.1/usr/bin:$PATH  
-```
-(the path is of course up to you where you put swift)  
-  
 ## Preprocessor Flags
 There are the following preprocessor flags defined in Package.swift:
 ### cSettings and swiftSettings
@@ -114,11 +61,6 @@ There are the following preprocessor flags defined in Package.swift:
  - CMP_FFMPEG_V6            (ffmpeg v6)
  - CMP_FFMPEG_V5            (ffmpeg v5)
  - CMP_FFMPEG_V4            (ffmpeg v4)
- - CMP_TARGET_UBUNTU_V22_04 (Ubuntu 22.04)
- - CMP_TARGET_UBUNTU_V24_04 (Ubuntu 24.04)
- - CMP_TARGET_FEDORA_V40    (Fedora 40)
- - CMP_TARGET_MANJARO_V24   (Manjaro 24)
- - CMP_PLATFORM_AMD64       (AMD64 distro)
  - CMP_PLATFORM_ARM64       (ARM64 distro)
   
 Uncomment any flag that is not appropriate.  
@@ -132,18 +74,6 @@ Are located at:
  - /usr/include/ffmpeg/*library* (Fedora 40)
  - /usr/include/*library* (Manjaro 24)
   
-### Cao (swift C wrapper library for libao (ao))
-Are located at:
- - /usr/include/ao/ (Ubuntu 22.04, 24.04)
- - /usr/include/ao/ (Fedora 40)
- - /usr/include/ao/ (Manjaro 24)
-  
-### Casound (swift C wrapper library for libasound (alsa))
-Are located at:
- - /usr/include/alsa/ (Ubuntu 22.04, 24.04)
- - /usr/include/alsa/ (Fedora 40)
- - /usr/include/alsa/ (Manjaro 24)
-  
 ### Cmpg123 (swift C wrapper library for libmpg123)
 Are located at:
  - /usr/include/ (Ubuntu 22.04)
@@ -151,14 +81,13 @@ Are located at:
  - /usr/include/ (Fedora 40)
  - /usr/include/ (Manjaro 24)
   
-## How to build CMPlayer.Linux
-CMPlayer.Linux is written in Swift. That means that Swift must be  
-installed firstly. See www.swift.org for download and install of Swift.
-  
+## How to build CMPlayer.macOS
+CMPlayer.macOS is written in Swift.
+
 Building **cmplayer** is relativly easy. After you clone the  
 project using the following:  
 ```bash
-git clone https://github.com/sith-ikjetil/CMPlayer.Linux.git
+git clone https://github.com/sith-ikjetil/CMPlayer.macOS.git
 ```
 You first must edit Package.swift in the CMPlayer.Linux directory.  
 You must uncomment the .define statements that apply, and comment out  
@@ -177,27 +106,14 @@ cSettings: [
     //.define("CMP_FFMPEG_V7"),
 ],
 swiftSettings: [
-    .define("CMP_PLATFORM_AMD64"),
-    //.define("CMP_PLATFORM_ARM64"),
-    .define("CMP_TARGET_UBUNTU_V22_04"),
-    //.define("CMP_TARGET_UBUNTU_V24_04"),
-    //.define("CMP_TARGET_FEDORA_V40"),
-    //.define("CMP_TARGET_MANJARO_V24"),
+    .define("CMP_PLATFORM_ARM64"),
     .define("CMP_FFMPEG_V4"),
     //.define("CMP_FFMPEG_V5"),
     //.define("CMP_FFMPEG_V6"),
     //.define("CMP_FFMPEG_V7"),
 ]
 ```
-In order to know which version of ffmpeg you have, you type in  
-ffmpeg in your terminal and see which version is installed on your  
-system. Again, uncomment the version that apply, and comment out the versions  
-that does not apply.  
-  
-You should set the CMP_TARGET_? to the closes match to your system. If none of these  
-flags work on you system, you might need to add support for your own system.  
-  
-You then need to stay in the CMPlayer.Linux directory and  execute the  
+You then need to stay in the CMPlayer.macOS directory and  execute the  
 following commands:  
 ```bash
 swift build
@@ -209,7 +125,7 @@ build for release using the command:
 swift build -c release
 ```
 If it once again builds without errors, you can find the binary in  
-the CMPlayer.Linux/.build/release directory. Then it is simply a job  
+the CMPlayer.macOS/.build/release directory. Then it is simply a job  
 to copy **cmplayer** to /usr/bin and execute the application.  
   
 You might get runtime errors for libraries that **cmplayer** depends on  
