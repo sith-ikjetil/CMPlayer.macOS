@@ -80,6 +80,13 @@ internal class Console {
         Console.printXY(1,1," ", g_rows*g_cols, .left, " ", ConsoleColor.black, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.none)
     }
     ///
+    /// clear screen no color
+    ///
+    static func clearScreenNoColor()
+    {
+        print("\u{001B}[2J\u{001B}[H", terminator: "")
+    }
+    ///
     /// Clears console screen given colors.
     ///
     static func clearScreen(colorBg: ConsoleColor, modBg: ConsoleColorModifier, colorText: ConsoleColor, modText: ConsoleColorModifier) -> Void {
@@ -258,7 +265,7 @@ internal class Console {
             // reset console colors
             Console.resetConsoleColors()
             // clear screen
-            Console.clearScreen();//system("clear")
+            Console.clearScreenNoColor();//system("clear")
             // print message
             print(msg)
             // exit application

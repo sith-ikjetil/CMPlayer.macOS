@@ -80,7 +80,7 @@ do {
     // reset console colors
     Console.resetConsoleColors()  
     // clear terminal
-    Console.clearScreen();//system("clear") 
+    Console.clearScreenNoColor();//system("clear") 
     // write exit message
     print("CMPlayer exited normally.")
     // log exit
@@ -101,7 +101,7 @@ do {
     // reset console colors
     Console.resetConsoleColors()
     // clear terminal
-    Console.clearScreen();//system("clear")    
+    Console.clearScreenNoColor();//system("clear")    
     // write error message
     print(msg)
     // log error
@@ -122,7 +122,7 @@ do {
     // reset console colors
     Console.resetConsoleColors()
     // clear terminal
-    Console.clearScreen();//system("clear")  
+    Console.clearScreenNoColor();//system("clear")  
     // write error message
     print(msg) 
     // log error

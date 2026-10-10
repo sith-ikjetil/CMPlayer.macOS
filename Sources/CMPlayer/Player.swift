@@ -145,7 +145,7 @@ internal class Player {
             // reset console colors
             Console.resetConsoleColors()
             // clear terminal
-            Console.clearScreen();//system("clear")            
+            Console.clearScreenNoColor();//system("clear")            
             // write error message
             print(msg) 
             // log error message
@@ -167,7 +167,7 @@ internal class Player {
             // reset console colors
             Console.resetConsoleColors()           
             // clear terminal
-            Console.clearScreen();//system("clear")            
+            Console.clearScreenNoColor();//system("clear")            
             // write error message
             print(msg) 
             // log error message
