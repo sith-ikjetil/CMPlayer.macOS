@@ -1,0 +1,4 @@
+module Cao {    
+    header "bridging-header.h"
+    export *
+}
