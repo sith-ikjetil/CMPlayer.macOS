@@ -12,21 +12,6 @@
 import Foundation
 
 ///
-/// Prints information about output devices.
-/// 
-func PrintAndExecuteOutputDevices() {  
-    // print header      
-    //print("Audio Output (ao):")
-    // print information about ao
-    //printAoInfo()    
-    // print new line
-    print("")
-    // print header
-    //print("ALSA:")
-    // print information about alsa
-    //printALSAInfo()        
-}
-///
 /// Prints some info about cmplayer's home directory and its files.
 /// 
 func PrintAndExecutePlayerHomeDirectory() {

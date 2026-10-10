@@ -85,14 +85,6 @@ internal class CommandLineHandler {
         print("CMPlayer Integrity Check")
         // print separator
         print("========================")
-        // print output devices ao and alsa
-        PrintAndExecuteOutputDevices()
-        // print new line>
-        print("")
-        // print about library files needed to run
-        // PrintAndExecuteLibraryFiles()
-        // print new line
-        // print("")
         // print info about home directory
         PrintAndExecutePlayerHomeDirectory()
         // print new line>
@@ -599,9 +591,6 @@ internal class CommandLineHandler {
         print(" --version                 = show version numbers")
         print(" --integrity-check         = do an integrity check")
         print(" --purge                   = remove all stored data")
-        print(" --set-output-api-ao       = sets audio output api to libao (ao)")
-        print(" --set-output-api-alsa     = sets audio output api to libasound (alsa)")
-        print(" --get-output-api          = gets audio output api")
         print(" --set-max-log-n <max>     = sets max log entries [25,1000]")
         print(" --get-max-log-n           = gets max log entries")
         print(" --set-max-history-n <max> = sets max history entries [25,1000]")

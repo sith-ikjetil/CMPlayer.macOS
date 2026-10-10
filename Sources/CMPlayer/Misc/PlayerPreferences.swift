@@ -38,8 +38,7 @@ internal enum ColorTheme: String {
 // Sound output library to use
 //
 internal enum OutputSoundLibrary: String {
-    case ao = "ao"
-    case alsa = "alsa"
+    case avfoundation = "avfoundation"
 }
 ///
 /// Represents CMPlayer PlayerPreferences.
@@ -57,7 +56,7 @@ internal class PlayerPreferences {
     static var crossfadeTimeInSeconds: Int = 4
     static var viewType: ViewType = ViewType.Details
     static var colorTheme: ColorTheme = ColorTheme.Default
-    static var outputSoundLibrary: OutputSoundLibrary = OutputSoundLibrary.ao
+    static var outputSoundLibrary: OutputSoundLibrary = OutputSoundLibrary.avfoundation
     static var logInformation: Bool = true
     static var logWarning: Bool = true
     static var logError: Bool = true
@@ -145,9 +144,6 @@ internal class PlayerPreferences {
                 }
                 if let aColorTheme = xeGeneral.attribute(forName: "colorTheme") {
                     PlayerPreferences.colorTheme = ColorTheme(rawValue: aColorTheme.stringValue ?? "default") ?? ColorTheme.Default
-                }
-                if let aOutputSoundLibrary = xeGeneral.attribute(forName: "outputSoundLibrary") {
-                    PlayerPreferences.outputSoundLibrary = OutputSoundLibrary(rawValue: aOutputSoundLibrary.stringValue ?? "ao") ?? OutputSoundLibrary.ao
                 }
                 if let aHistoryMaxEntries = xeGeneral.attribute(forName: "historyMaxEntries") {
                     PlayerPreferences.historyMaxEntries = Int(aHistoryMaxEntries.stringValue ?? "1000") ?? 1000
