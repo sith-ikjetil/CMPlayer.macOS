@@ -10,118 +10,21 @@
 // import
 //
 import Foundation
-import Cao
-import Casound
+
 ///
 /// Prints information about output devices.
 /// 
 func PrintAndExecuteOutputDevices() {  
     // print header      
-    print("Audio Output (ao):")
+    //print("Audio Output (ao):")
     // print information about ao
-    printAoInfo()    
+    //printAoInfo()    
     // print new line
     print("")
     // print header
-    print("ALSA:")
+    //print("ALSA:")
     // print information about alsa
-    printALSAInfo()        
-}
-///
-/// prints ao information
-/// 
-func printAoInfo() {
-    // create variable for number of ao drivers found
-    var driverCount: Int32 = 0    
-    // if we have a valid driver info list
-    if let driverInfoList = ao_driver_info_list(&driverCount) {                
-        // Iterate through the available drivers and print them        
-        for i in 0..<Int(driverCount)
-        {
-            // if driver info list item i is a valid non nil pointer
-            if let driverInfoPointer = driverInfoList[i] {
-                // create constant driverInfo of type ao_info
-                let driverInfo = driverInfoPointer.pointee
-                // print ao_info.name
-                print(" > \(String(cString: driverInfo.name))")            
-                //if driverInfo.type == AO_TYPE_LIVE {
-                //    print("  Description: \(String(cString: driverInfo.short_name))")
-                //    print("  Comment: \(String(cString: driverInfo.comment))\n")                    
-                //}
-            }             
-        }    
-    } 
-    // else no valid ao drivers
-    else {        
-        // print error message
-        print(" > (e): Failed to retrieve audio driver information.")
-    }
-}
-///
-/// prints also infomation
-/// 
-func printALSAInfo() {
-    // create err return value variable    
-    var err: Int32 = 0
-    // creat card id variable
-    var card: Int32 = -1    
-    // handle alsa
-    var ctlHandle: OpaquePointer?
-    // Get the first card
-    err = snd_card_next(&card)
-    // guard for success
-    guard err >= 0, card >= 0 else {
-        // else we have an error
-        // print result
-        print(" > (e): No sound cards found: '\(String(cString: snd_strerror(err)))'")
-        // return
-        return
-    }    
-    // loop while we have sound cards
-    while card >= 0 {
-        // at least one card
-        // open the control interface for the card
-        let cardName = "hw:\(card)"
-        // try to open control interface
-        if snd_ctl_open(&ctlHandle, cardName, 0) < 0 {
-            // error
-            // print error message
-            print(" > (e): Error opening control interface: '\(String(cString: snd_strerror(err)))'")
-            // break loop
-            break
-        }
-        // manually allocate memory for card info
-        let cardInfoSize = snd_ctl_card_info_sizeof()
-        // create a read/write pointer to card info
-        let cardInfoRaw = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(cardInfoSize))
-        // cleanup by defer
-        defer {
-            // deallocate raw pointer when out of scope
-            cardInfoRaw.deallocate()
-        }
-        // cast the raw memory to an OpaquePointer
-        let cardInfoTyped: OpaquePointer? = OpaquePointer(cardInfoRaw)
-        // get card information
-        if snd_ctl_card_info(ctlHandle, cardInfoTyped) < 0 {
-            // error
-            // print error message
-            print(" > (e): Error getting card information: '\(String(cString: snd_strerror(err)))'")
-            // close handle
-            snd_ctl_close(ctlHandle)
-            // break loop
-            break
-        }
-        // print card information
-        print(" > Card \(card): \(String(cString: snd_ctl_card_info_get_id(cardInfoTyped))) [\(String(cString: snd_ctl_card_info_get_name(cardInfoTyped)))], driver \(String(cString: snd_ctl_card_info_get_driver(cardInfoTyped)))")        
-        // close handle
-        snd_ctl_close(ctlHandle)
-        // move to the next card
-        if snd_card_next(&card) < 0 {
-            // error
-            // break loop
-            break
-        }
-    }
+    //printALSAInfo()        
 }
 ///
 /// Prints some info about cmplayer's home directory and its files.

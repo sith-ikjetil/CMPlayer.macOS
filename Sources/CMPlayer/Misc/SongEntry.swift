@@ -11,8 +11,6 @@
 // import.
 //
 import Foundation
-import FoundationNetworking
-import Cmpg123
 
 ///
 /// Represents CMPlayer SongEntry

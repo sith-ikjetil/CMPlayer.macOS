@@ -10,8 +10,7 @@
 /// import
 /// 
 import Foundation
-import Cao
-import Casound
+
 ///
 /// State class for CommandLineArguments handling
 /// of command line arguments. Can be used through
@@ -50,9 +49,6 @@ internal class CommandLineHandler {
             case "--integrity-check": return CommandLineHandler.execute__integrity_check()
             case "--version": return CommandLineHandler.execute__version()
             case "--purge": return CommandLineHandler.execute__purge()
-            case "--set-output-api-ao": return CommandLineHandler.execute__set_output_api_ao()
-            case "--set-output-api-alsa": return CommandLineHandler.execute__set_output_api_alsa()
-            case "--get-output-api": return CommandLineHandler.execute__get_output_api()
             case "--set-max-log-n": return CommandLineHandler.execute__set_max_log_n()
             case "--get-max-log-n": return CommandLineHandler.execute__get_max_log_n()
             case "--set-max-history-n": return CommandLineHandler.execute__set_max_history_n()
@@ -84,7 +80,7 @@ internal class CommandLineHandler {
         // load preferences
         PlayerPreferences.ensureLoadPreferences()                    
         // initialize ao
-        ao_initialize()  // initialize libao 
+        //ao_initialize()  // initialize libao 
         // print header
         print("CMPlayer Integrity Check")
         // print separator
@@ -110,7 +106,7 @@ internal class CommandLineHandler {
         // print new line>
         print("")
         // shutdown ao
-        ao_shutdown()
+        //ao_shutdown()
         // exit application
         exit(ExitCodes.SUCCESS.rawValue)   
     }
@@ -172,82 +168,6 @@ internal class CommandLineHandler {
         // exit application
         exit(ExitCodes.SUCCESS.rawValue)
     }  
-    ///
-    /// execute --set-output-api-ao
-    /// 
-    private static func execute__set_output_api_ao() 
-    {
-        // print header
-        print("CMPlayer: --set-output-api-ao")
-        // print separator
-        print("=============================")
-        // ensure directories exists
-        PlayerDirectories.ensureDirectoriesExistence()
-        // ensure load preferences
-        PlayerPreferences.ensureLoadPreferences()
-        // set preferences outputSoundLibrary to ao
-        PlayerPreferences.outputSoundLibrary = OutputSoundLibrary.ao
-        // save preferences
-        PlayerPreferences.savePreferences()
-        // print result
-        print("(i): Output sound set to ao")
-        // print new line
-        print("")
-        // exist application
-        exit(ExitCodes.SUCCESS.rawValue)
-    }
-    ///
-    /// execute --set-output-api-alsa
-    /// 
-    private static func execute__set_output_api_alsa() 
-    {
-        // print header
-        print("CMPlayer: --set-output-api-alsa")
-        // print separator
-        print("===============================")
-        // ensure directories exists
-        PlayerDirectories.ensureDirectoriesExistence()
-        // ensure load preferences
-        PlayerPreferences.ensureLoadPreferences()
-        // set preferences outputSoundLibrary to alsa
-        PlayerPreferences.outputSoundLibrary = OutputSoundLibrary.alsa
-        // save preferences
-        PlayerPreferences.savePreferences()
-        // print result
-        print("(i): Output sound set to alsa")
-        // print new line
-        print("")
-        // exit application
-        exit(ExitCodes.SUCCESS.rawValue)
-    }
-    ///
-    /// execute --get-output-api
-    /// 
-    private static func execute__get_output_api()
-    {        
-        // print header
-        print("CMPlayer: --get-output-api")
-        // print separator
-        print("==========================")
-        // ensure directory exists
-        PlayerDirectories.ensureDirectoriesExistence()
-        // ensure log preferences
-        PlayerPreferences.ensureLoadPreferences()
-        // if preferences outputSoundLibrary is ao
-        if PlayerPreferences.outputSoundLibrary == OutputSoundLibrary.ao {
-            // print result ao
-            print("(i): Output api is: ao")
-        }
-        // else if preferences outputSoundLibrary is alsa
-        else if PlayerPreferences.outputSoundLibrary == OutputSoundLibrary.alsa {
-            // print result alsa
-            print("(i): Output api is: alsa")
-        }                   
-        // print new line
-        print("")
-        // exit application
-        exit(ExitCodes.SUCCESS.rawValue)
-    }
     ///
     /// execute --set-max-log-size
     /// 

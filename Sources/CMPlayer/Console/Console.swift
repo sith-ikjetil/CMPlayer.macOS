@@ -132,7 +132,7 @@ internal class Console {
         // Get current terminal attributes
         tcgetattr(STDIN_FILENO, &term)        
         // Modify the terminal flags to disable echo
-        term.c_lflag &= ~UInt32(ICANON | ECHO)        
+        term.c_lflag &= ~UInt(ICANON | ECHO)        
         // Set the modified attributes immediately (TCSANOW)
         tcsetattr(STDIN_FILENO, TCSANOW, &term)
     }    
@@ -145,7 +145,7 @@ internal class Console {
         // Get current terminal attributes
         tcgetattr(STDIN_FILENO, &term)        
         // Restore the terminal flags to enable echo
-        term.c_lflag |= UInt32(ICANON | ECHO)        
+        term.c_lflag |= UInt(ICANON | ECHO)        
         // Set the modified attributes immediately (TCSANOW)
         tcsetattr(STDIN_FILENO, TCSANOW, &term)
     }
@@ -258,7 +258,7 @@ internal class Console {
             // reset console colors
             Console.resetConsoleColors()
             // clear screen
-            system("clear")
+            Console.clearScreen();//system("clear")
             // print message
             print(msg)
             // exit application

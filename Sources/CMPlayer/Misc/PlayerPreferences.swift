@@ -10,7 +10,7 @@
 // import.
 //
 import Foundation
-import FoundationXML
+
 ///
 /// What to do when log max size is reached.
 ///

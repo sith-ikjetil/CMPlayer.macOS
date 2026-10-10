@@ -1,4 +1,0 @@
-module Cffmpeg {    
-    header "bridging-header.h"
-    export *
-}

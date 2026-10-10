@@ -8,8 +8,8 @@
 // import.
 //
 import Foundation
-import Cmpg123
-import Glibc
+import Darwin
+
 //
 // Represents CMPlayer Player.
 //
@@ -145,7 +145,7 @@ internal class Player {
             // reset console colors
             Console.resetConsoleColors()
             // clear terminal
-            system("clear")            
+            Console.clearScreen();//system("clear")            
             // write error message
             print(msg) 
             // log error message
@@ -167,7 +167,7 @@ internal class Player {
             // reset console colors
             Console.resetConsoleColors()           
             // clear terminal
-            system("clear")            
+            Console.clearScreen();//system("clear")            
             // write error message
             print(msg) 
             // log error message

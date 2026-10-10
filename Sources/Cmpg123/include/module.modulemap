@@ -1,4 +1,0 @@
-module Cmpg123 {    
-    header "bridging-header.h"
-    export *
-}

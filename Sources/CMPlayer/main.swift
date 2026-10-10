@@ -8,10 +8,7 @@
 // import.
 //
 import Foundation
-import Cmpg123
-import Cao
-import Casound
-import Glibc
+import Darwin
 //
 // Global constants.
 //
@@ -55,20 +52,6 @@ internal var g_assumeSearchMode: Bool = false           // assume search will gi
 //======================================
 // Handle command line arguments
 CommandLineHandler.processCommandLine()
-// initialize libmpg123
-guard mpg123_init() == 0 else {
-    print("Failed to initialize libmpg123")
-    exit(ExitCodes.ERROR_INIT_LIBMPG.rawValue)
-}
-// initialize libao
-ao_initialize()
-// ensure we exit/close libmpg123/libao
-atexit( {    
-    // close libmpg123
-    mpg123_exit()
-    // close libao
-    ao_shutdown()
-})
 // we have normal startup
 // redirect stderr
 // we do this to remove process_comment messages
@@ -97,7 +80,7 @@ do {
     // reset console colors
     Console.resetConsoleColors()  
     // clear terminal
-    system("clear") 
+    Console.clearScreen();//system("clear") 
     // write exit message
     print("CMPlayer exited normally.")
     // log exit
@@ -118,7 +101,7 @@ do {
     // reset console colors
     Console.resetConsoleColors()
     // clear terminal
-    system("clear")    
+    Console.clearScreen();//system("clear")    
     // write error message
     print(msg)
     // log error
@@ -139,7 +122,7 @@ do {
     // reset console colors
     Console.resetConsoleColors()
     // clear terminal
-    system("clear")  
+    Console.clearScreen();//system("clear")  
     // write error message
     print(msg) 
     // log error

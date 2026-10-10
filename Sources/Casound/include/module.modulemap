@@ -1,4 +1,0 @@
-module Casound {    
-    header "bridging-header.h"
-    export *
-}

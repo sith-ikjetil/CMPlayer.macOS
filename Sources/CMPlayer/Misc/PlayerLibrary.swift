@@ -10,8 +10,7 @@
 // import.
 //
 import Foundation
-import FoundationNetworking
-import FoundationXML
+
 ///
 /// Represents CMPlayer PlayerLibrary
 ///
