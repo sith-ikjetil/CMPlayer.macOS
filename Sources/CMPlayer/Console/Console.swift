@@ -38,8 +38,8 @@ internal class Console {
     //
     // static private constants.
     //        
-    static private let concurrentQueue1 = DispatchQueue(label: "cqueue.cmplayer.linux.console.1", attributes: .concurrent)
-    static private let concurrentQueue2 = DispatchQueue(label: "cqueue.console.music.player.macos.2.console", attributes: .concurrent)
+    static private let concurrentQueue1 = DispatchQueue(label: "cqueue.cmplayer.macos.console.1", attributes: .concurrent)
+    static private let concurrentQueue2 = DispatchQueue(label: "cqueue.cmplayer.macos.console.2", attributes: .concurrent)
     static private let sigintSrcSIGINT = DispatchSource.makeSignalSource(signal: Int32(SIGINT), queue: Console.concurrentQueue1) // Ctrl+C
     //static private let sigintSrcSIGQUIT = DispatchSource.makeSignalSource(signal: Int32(SIGQUIT), queue: Console.concurrentQueue1)
     //static private let sigintSrcSIGILL = DispatchSource.makeSignalSource(signal: Int32(SIGILL), queue: Console.concurrentQueue1)
