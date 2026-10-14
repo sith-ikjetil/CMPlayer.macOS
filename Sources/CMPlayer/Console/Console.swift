@@ -39,7 +39,7 @@ internal class Console {
     // static private constants.
     //        
     static private let concurrentQueue1 = DispatchQueue(label: "cqueue.cmplayer.linux.console.1", attributes: .concurrent)
-    //static private let concurrentQueue2 = DispatchQueue(label: "cqueue.console.music.player.macos.2.console", attributes: .concurrent)
+    static private let concurrentQueue2 = DispatchQueue(label: "cqueue.console.music.player.macos.2.console", attributes: .concurrent)
     static private let sigintSrcSIGINT = DispatchSource.makeSignalSource(signal: Int32(SIGINT), queue: Console.concurrentQueue1) // Ctrl+C
     //static private let sigintSrcSIGQUIT = DispatchSource.makeSignalSource(signal: Int32(SIGQUIT), queue: Console.concurrentQueue1)
     //static private let sigintSrcSIGILL = DispatchSource.makeSignalSource(signal: Int32(SIGILL), queue: Console.concurrentQueue1)
@@ -72,6 +72,7 @@ internal class Console {
     //static private let sigintSrcSIGUSR2 = DispatchSource.makeSignalSource(signal: Int32(SIGUSR2), queue: Console.concurrentQueue1)
     //static private let sigintSrcSIGTHR = DispatchSource.makeSignalSource(signal: Int32(SIGTHR), queue: Console.concurrentQueue1)
     //static private let sigintSrcSIGLIBRT = DispatchSource.makeSignalSource(signal: Int32(SIGLIBRT), queue: Console.concurrentQueue1)
+    static private var resizeWorkItem: DispatchWorkItem?
     ///
     /// Clears console screen.
     ///
@@ -274,7 +275,7 @@ internal class Console {
         // start processing signal
         sigintSrcSIGINT.resume()
         // Respond to window resize (SIGWINCH)
-        sigintSrcSIGWINCH.setEventHandler {         
+        /*sigintSrcSIGWINCH.setEventHandler {         
             // create winsize structure for terminal size   
             var w = winsize()
             // set variable rows to g_rows
@@ -301,6 +302,46 @@ internal class Console {
                 // set g_termSizeIsChanging flag to false
                 g_termSizeIsChanging = false
             }
+        }*/
+        sigintSrcSIGWINCH.setEventHandler {
+            g_termSizeIsChanging = true
+            Console.clearScreenCurrentTheme()
+            
+            // Cancel the previously scheduled resize notification
+            Console.resizeWorkItem?.cancel()
+
+            // Create winsize structure for terminal size
+            var w = winsize()
+
+            var rows = g_rows
+            var cols = g_cols
+
+            // Get terminal size
+            if ioctl(STDOUT_FILENO, UInt(TIOCGWINSZ), &w) == 0 {
+                rows = Int(w.ws_row)
+                cols = Int(w.ws_col)
+            }
+
+            // Update global terminal dimensions
+            g_rows = rows
+            g_cols = cols
+
+            // Create a new delayed notification
+            let workItem = DispatchWorkItem {
+                if !g_tscpStack.isEmpty {
+                    g_tscpStack.last?.terminalSizeHasChanged()
+                    g_termSizeIsChanging = false
+                }
+            }
+
+            // Remember the new work item
+            Console.resizeWorkItem = workItem
+
+            // Execute only after 250 ms without another SIGWINCH
+            concurrentQueue2.asyncAfter(
+                deadline: .now() + .milliseconds(20),
+                execute: workItem
+            )
         }
         // start processing signal
         sigintSrcSIGWINCH.resume()
