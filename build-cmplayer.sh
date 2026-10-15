@@ -127,6 +127,15 @@ chmod 755 "$TARGET"
 # Remove extended attributes from staged file.
 xattr -c "$TARGET"
 
+# Remove AppleDouble metadata files.
+dot_clean -m "$PAYLOAD"
+
+# Remove any extended attributes merged by dot_clean.
+xattr -cr "$PAYLOAD"
+
+# Prevent AppleDouble metadata during packaging.
+export COPYFILE_DISABLE=1
+
 # ----------------------------------------
 # 3. Sign executable
 # ----------------------------------------
