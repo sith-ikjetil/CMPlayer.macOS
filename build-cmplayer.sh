@@ -1,0 +1,264 @@
+#!/bin/bash
+set -euo pipefail
+
+#
+# CMPlayer macOS Release Script
+#
+# Usage:
+#   ./release.sh 1.7.0
+#   ./release.sh 1.7.0 --install
+#
+
+# ----------------------------------------
+# Configuration
+# ----------------------------------------
+
+APP_NAME="cmplayer"
+PRODUCT_NAME="console-music-player"
+
+APP_ID="org.cmplayer.console-music-player"
+
+APP_CERT="Developer ID Application: Kjetil Solberg (9L467T2S8C)"
+PKG_CERT="Developer ID Installer: Kjetil Solberg (9L467T2S8C)"
+
+NOTARY_PROFILE="CMPlayer"
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DIST_DIR="${SCRIPT_DIR}/dist"
+
+# ----------------------------------------
+# Arguments
+# ----------------------------------------
+
+if [[ $# -lt 1 || $# -gt 2 ]]; then
+    echo "Usage: $0 <version> [--install]"
+    exit 1
+fi
+
+VERSION="$1"
+INSTALL=false
+
+if [[ ! "$VERSION" =~ ^[0-9]+(\.[0-9]+){1,2}$ ]]; then
+    echo "ERROR: Invalid version: $VERSION"
+    exit 1
+fi
+
+if [[ $# -eq 2 ]]; then
+    if [[ "$2" != "--install" ]]; then
+        echo "ERROR: Unknown argument: $2"
+        exit 1
+    fi
+    INSTALL=true
+fi
+
+PKG_NAME="${PRODUCT_NAME}-${VERSION}.pkg"
+PKG_PATH="${DIST_DIR}/${PKG_NAME}"
+
+# ----------------------------------------
+# Helpers
+# ----------------------------------------
+
+step() {
+    echo
+    echo "========================================"
+    echo "$1"
+    echo "========================================"
+}
+
+fail() {
+    echo "ERROR: $1" >&2
+    exit 1
+}
+
+# ----------------------------------------
+# Prerequisites
+# ----------------------------------------
+
+cd "$SCRIPT_DIR"
+mkdir -p "$DIST_DIR"
+
+for tool in swift codesign pkgbuild productsign \
+            pkgutil spctl xcrun security; do
+    command -v "$tool" >/dev/null 2>&1 ||
+        fail "Missing tool: $tool"
+done
+
+security find-identity -v -p codesigning |
+    grep -Fq "$APP_CERT" ||
+    fail "Application signing certificate not found"
+
+security find-certificate -c "$PKG_CERT" >/dev/null 2>&1 ||
+    fail "Installer certificate not found"
+
+# ----------------------------------------
+# 1. Build
+# ----------------------------------------
+
+step "1. Building CMPlayer ${VERSION}"
+
+swift build -c release
+
+BIN_DIR="$(swift build -c release --show-bin-path)"
+EXECUTABLE="${BIN_DIR}/${APP_NAME}"
+
+[[ -f "$EXECUTABLE" ]] ||
+    fail "Executable not found: $EXECUTABLE"
+
+# ----------------------------------------
+# 2. Prepare staging directory
+# ----------------------------------------
+
+step "2. Preparing staging directory"
+
+STAGING="$(mktemp -d)"
+trap 'rm -rf "$STAGING"' EXIT
+
+PAYLOAD="${STAGING}/root"
+BIN_TARGET="${PAYLOAD}/usr/local/bin"
+
+mkdir -p "$BIN_TARGET"
+
+cp "$EXECUTABLE" "$BIN_TARGET/$APP_NAME"
+
+TARGET="${BIN_TARGET}/${APP_NAME}"
+
+chmod 755 "$TARGET"
+
+# Remove extended attributes from staged file.
+xattr -c "$TARGET"
+
+# ----------------------------------------
+# 3. Sign executable
+# ----------------------------------------
+
+step "3. Signing executable"
+
+codesign --force \
+    --options runtime \
+    --timestamp \
+    --identifier "$APP_ID" \
+    --sign "$APP_CERT" \
+    "$TARGET"
+
+# ----------------------------------------
+# 4. Verify executable
+# ----------------------------------------
+
+step "4. Verifying executable"
+
+codesign --verify \
+    --strict \
+    --verbose=2 \
+    "$TARGET"
+
+codesign -dv --verbose=2 "$TARGET"
+
+# ----------------------------------------
+# 5. Build unsigned package
+# ----------------------------------------
+
+step "5. Building installer package"
+
+UNSIGNED_PKG="${STAGING}/unsigned.pkg"
+
+pkgbuild \
+    --root "$PAYLOAD" \
+    --identifier "$APP_ID" \
+    --version "$VERSION" \
+    --install-location / \
+    "$UNSIGNED_PKG"
+
+# ----------------------------------------
+# 6. Sign package
+# ----------------------------------------
+
+step "6. Signing installer package"
+
+# Never overwrite an existing release.
+[[ ! -e "$PKG_PATH" ]] ||
+    fail "Release already exists: $PKG_PATH"
+
+productsign \
+    --sign "$PKG_CERT" \
+    "$UNSIGNED_PKG" \
+    "$PKG_PATH"
+
+pkgutil --check-signature "$PKG_PATH"
+
+# ----------------------------------------
+# 7. Notarize
+# ----------------------------------------
+
+step "7. Notarizing package"
+
+NOTARY_OUTPUT="${STAGING}/notary-result.json"
+
+if ! xcrun notarytool submit "$PKG_PATH" \
+    --keychain-profile "$NOTARY_PROFILE" \
+    --wait \
+    --output-format json > "$NOTARY_OUTPUT"; then
+
+    cat "$NOTARY_OUTPUT"
+    fail "Notarization submission failed"
+fi
+
+cat "$NOTARY_OUTPUT"
+
+# Verify the actual notarization status.
+NOTARY_STATUS=$(
+    /usr/bin/plutil -extract status raw \
+        -o - "$NOTARY_OUTPUT"
+)
+
+if [[ "$NOTARY_STATUS" != "Accepted" ]]; then
+    fail "Notarization was not accepted: $NOTARY_STATUS"
+fi
+
+# ----------------------------------------
+# 8. Staple
+# ----------------------------------------
+
+step "8. Stapling notarization ticket"
+
+xcrun stapler staple "$PKG_PATH"
+
+# ----------------------------------------
+# 9. Verify package
+# ----------------------------------------
+
+step "9. Verifying package"
+
+pkgutil --check-signature "$PKG_PATH"
+
+xcrun stapler validate "$PKG_PATH"
+
+spctl --assess \
+    --type install \
+    --verbose=2 \
+    "$PKG_PATH"
+
+# ----------------------------------------
+# 10. Optionally install
+# ----------------------------------------
+
+if [[ "$INSTALL" == true ]]; then
+    step "10. Installing CMPlayer"
+
+    sudo installer \
+        -pkg "$PKG_PATH" \
+        -target /
+fi
+
+# ----------------------------------------
+# Finished
+# ----------------------------------------
+
+step "Release completed successfully"
+
+echo "Version: $VERSION"
+echo "Package: $PKG_PATH"
+
+shasum -a 256 "$PKG_PATH"
+
+echo
+echo "CMPlayer is ready for distribution!"
