@@ -1,29 +1,42 @@
 // AudioPlayer.swift
 // Created by Kjetil Kr Solberg on 24-09-2024.
 // Copyright © 2024 Kjetil Kr Solberg. All rights reserved.
-
 import Foundation
 import AVFoundation
-
 /// Local-file audio playback. All mutable playback state is serialized.
 /// Retain the instance while playing; call stop() during application shutdown.
 internal final class AnyAudioPlayer: CmpAudioPlayerProtocol, @unchecked Sendable {
+    // path to file to play
     private let filePath: URL
+    // queue for async work
     private let queue = DispatchQueue(label: "CMPlayer.AnyAudioPlayer")
+    // player object from AVFoundation
     private var player: AVAudioPlayer?
+    // timer
     private var timer: DispatchSourceTimer?
+    // are we playing.
     private var m_isPlaying = false
+    // are we paused
     private var m_isPaused = false
+    // have we played
     private var m_hasPlayed = false
+    // elapsed time since playing started
     private var m_timeElapsed: UInt64 = 0
+    // duration of filePath media file
     private var m_duration: UInt64 = 0
+    // target fade volume [0,1]
     private var m_targetFadeVolume: Float = 1
+    // target fade duration ms
     private var m_targetFadeDuration: UInt64 = 0
+    // should we do crossfade
     private var m_enableCrossfade = false
-
+    // thread safe get is playing
     var isPlaying: Bool { queue.sync { m_isPlaying } }
+    // thread safe get is paused
     var isPaused: Bool { queue.sync { m_isPaused } }
+    // thread safe get has played
     var hasPlayed: Bool { queue.sync { m_hasPlayed } }
+    // thread safe get time elapsed
     var timeElapsed: UInt64 {
         queue.sync {
             if let player, m_isPlaying {
@@ -32,17 +45,26 @@ internal final class AnyAudioPlayer: CmpAudioPlayerProtocol, @unchecked Sendable
             return m_timeElapsed
         }
     }
+    // thread safe get duration
     var duration: UInt64 { queue.sync { m_duration } }
-
-    init(path: URL) { filePath = path }
-
+    //
+    // constructor
+    //
+    init(path: URL) 
+    { 
+        filePath = path 
+    }
+    //
+    // destructor
+    //
     deinit {
         // Pending handlers hold only weak references to this object.
         timer?.cancel()
         player?.stop()
     }
-
-    /// Starts asynchronously after synchronously opening and preparing the file.
+    //
+    // Starts asynchronously after synchronously opening and preparing the file.
+    //
     func play() throws {
         try queue.sync {
             if m_isPaused {
@@ -83,7 +105,6 @@ internal final class AnyAudioPlayer: CmpAudioPlayerProtocol, @unchecked Sendable
             startTimer()
         }
     }
-
     /// Preserves the original implementation: position is milliseconds REMAINING.
     /// A position equal to duration seeks to the beginning; zero seeks to the end.
     func seekToPos(position: UInt64) {
@@ -95,7 +116,6 @@ internal final class AnyAudioPlayer: CmpAudioPlayerProtocol, @unchecked Sendable
             if position == 0 { finishPlayback() }
         }
     }
-
     /// Retained for interface compatibility. Scales little-endian signed 16-bit PCM.
     /// The buffer need not be aligned; a trailing partial sample is left unchanged.
     func adjustVolume(buffer: UnsafeMutablePointer<Int8>, size: Int, volume: Float) {
@@ -111,7 +131,6 @@ internal final class AnyAudioPlayer: CmpAudioPlayerProtocol, @unchecked Sendable
             buffer[offset + 1] = Int8(bitPattern: UInt8(truncatingIfNeeded: result >> 8))
         }
     }
-
     /// Fades from full volume to the target during the final fadeDuration milliseconds.
     func setCrossfadeVolume(volume: Float, fadeDuration: UInt64) {
         guard volume.isFinite, volume >= 0, volume <= 1,
@@ -124,14 +143,18 @@ internal final class AnyAudioPlayer: CmpAudioPlayerProtocol, @unchecked Sendable
             applyCrossfade()
         }
     }
-
+    //
+    // thread safe stop playback
+    //
     func stop() {
         queue.sync {
             guard m_isPlaying else { return }
             finishPlayback()
         }
     }
-
+    // 
+    // thread safe pause playback
+    //
     func pause() {
         queue.sync {
             guard m_isPlaying, !m_isPaused, let player else { return }
@@ -141,7 +164,9 @@ internal final class AnyAudioPlayer: CmpAudioPlayerProtocol, @unchecked Sendable
             // isPlaying remains true during pause, matching the original state model.
         }
     }
-
+    //
+    // thread safe resume playback
+    //
     func resume() {
         queue.sync {
             guard m_isPlaying, m_isPaused, let player else { return }
@@ -153,7 +178,9 @@ internal final class AnyAudioPlayer: CmpAudioPlayerProtocol, @unchecked Sendable
             }
         }
     }
-
+    //
+    // repeatable code to check for completion of playback
+    //
     private func startTimer() {
         timer?.cancel()
         let source = DispatchSource.makeTimerSource(queue: queue)
@@ -172,7 +199,9 @@ internal final class AnyAudioPlayer: CmpAudioPlayerProtocol, @unchecked Sendable
         timer = source
         source.resume()
     }
-
+    //
+    // apply crossfade
+    //
     private func applyCrossfade() {
         guard let player else { return }
         guard m_enableCrossfade, m_targetFadeDuration > 0 else {
@@ -183,7 +212,9 @@ internal final class AnyAudioPlayer: CmpAudioPlayerProtocol, @unchecked Sendable
         let fraction = min(1, remaining / (Double(m_targetFadeDuration) / 1000))
         player.volume = m_targetFadeVolume + (1 - m_targetFadeVolume) * Float(fraction)
     }
-
+    //
+    // clean up after playback
+    //
     private func finishPlayback() {
         timer?.cancel()
         timer = nil
@@ -195,13 +226,14 @@ internal final class AnyAudioPlayer: CmpAudioPlayerProtocol, @unchecked Sendable
         m_isPlaying = false
         m_isPaused = false
     }
-
+    //
+    // get time in ms
+    //
     private static func milliseconds(_ seconds: Double) -> UInt64 {
         guard seconds.isFinite, seconds > 0 else { return 0 }
         let value = seconds * 1000
         return value < Double(UInt64.max) ? UInt64(value) : UInt64.max
     }
-
     /// Synchronous interface preserved; AVFoundation loads metadata on a detached task.
     /// This call blocks its caller while loading. For UI applications call it off the UI thread.
     static func gatherMetadata(path: URL) throws -> CmpMetadata {
@@ -232,12 +264,16 @@ internal final class AnyAudioPlayer: CmpAudioPlayerProtocol, @unchecked Sendable
         if let value = snapshot.values["year"] { metadata.recordingYear = extractMetadataYear(text: value) }
         return metadata
     }
-
+    //
+    // MetadataSnapshot
+    //
     private struct MetadataSnapshot: Sendable {
         let duration: UInt64
         let values: [String: String]
     }
-
+    //
+    // MetadataResult
+    //
     private final class MetadataResult: @unchecked Sendable {
         private let semaphore = DispatchSemaphore(value: 0)
         private let lock = NSLock()
@@ -257,7 +293,9 @@ internal final class AnyAudioPlayer: CmpAudioPlayerProtocol, @unchecked Sendable
             return try result!.get()
         }
     }
-
+    //
+    // load metadata from path.
+    //
     private static func loadMetadata(path: URL) async throws -> MetadataSnapshot {
         let asset = AVURLAsset(url: path)
         let duration = try await asset.load(.duration).seconds
