@@ -115,10 +115,13 @@ trap 'rm -rf "$STAGING"' EXIT
 
 PAYLOAD="${STAGING}/root"
 BIN_TARGET="${PAYLOAD}/usr/local/bin"
+#APP_TARGET="${PAYLOAD}/Applications"
 
 mkdir -p "$BIN_TARGET"
+#mkdir -p "$APP_TARGET"
 
 cp "$EXECUTABLE" "$BIN_TARGET/$APP_NAME"
+#cp -r "./CMPlayer.app" "$APP_TARGET"
 
 TARGET="${BIN_TARGET}/${APP_NAME}"
 
