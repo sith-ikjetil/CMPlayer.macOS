@@ -32,9 +32,7 @@
 	<key>CFBundleDisplayName</key>
 	<string>CMPlayer</string>
 	<key>CFBundleIconFile</key>
-	<string>ApplicationStub</string>
-	<key>CFBundleIconName</key>
-	<string>CMPlayer</string>
+	<string>CMPlayer.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>org.cmplayer.CMPlayer</string>
 	<key>CFBundleInfoDictionaryVersion</key>
