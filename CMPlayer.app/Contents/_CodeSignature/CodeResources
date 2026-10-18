@@ -12,6 +12,10 @@
 		<data>
 		b0VqSCc564jUjJZ1maLmhsidjn4=
 		</data>
+		<key>Resources/CMPlayer.icns</key>
+		<data>
+		r7bek90sZJ26hE0EsRoPzsXSSg4=
+		</data>
 		<key>Resources/InfoPlist.loctable</key>
 		<data>
 		ad87IC0BGq7/fDjodqk0bVCalG8=
@@ -19,6 +23,10 @@
 		<key>Resources/Localizable.loctable</key>
 		<data>
 		O8aSi9J/EMJdHKvuBjYWVQ2osL8=
+		</data>
+		<key>Resources/cmplayer.command</key>
+		<data>
+		d/KkVflxi1W95Xoqq2494qn8l/Q=
 		</data>
 	</dict>
 	<key>files2</key>
@@ -37,6 +45,13 @@
 			HRbIhS2xMlpKMjUvn8zyWhqbwbBGJhJlmF81wQr833I=
 			</data>
 		</dict>
+		<key>Resources/CMPlayer.icns</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			tk3X6+qSRil66RqemC5BxWX5qXJQbQvJlqhZaclQMog=
+			</data>
+		</dict>
 		<key>Resources/InfoPlist.loctable</key>
 		<dict>
 			<key>hash2</key>
@@ -51,14 +66,12 @@
 			6UVqTUfMPz5ddAd3P41oQaooyzo+p/2hsyy/4itJZwk=
 			</data>
 		</dict>
-		<key>document.wflow</key>
+		<key>Resources/cmplayer.command</key>
 		<dict>
-			<key>cdhash</key>
+			<key>hash2</key>
 			<data>
-			pYF5Tdt5EwjdmwogPXJEo4LFRdg=
+			eGxUXwA5+4cwjveTeh4PzTPuEFFixQXtlxiTQyYsylI=
 			</data>
-			<key>requirement</key>
-			<string>identifier document and anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = "9L467T2S8C"</string>
 		</dict>
 	</dict>
 	<key>rules</key>

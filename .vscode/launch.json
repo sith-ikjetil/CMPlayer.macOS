@@ -19,6 +19,26 @@
             "target": "cmplayer",
             "configuration": "release",
             "preLaunchTask": "swift: Build Release cmplayer"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:CMPlayer.macOS}",
+            "name": "Debug cmpshim",
+            "target": "cmpshim",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug cmpshim"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:CMPlayer.macOS}",
+            "name": "Release cmpshim",
+            "target": "cmpshim",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release cmpshim"
         }
     ]
 }

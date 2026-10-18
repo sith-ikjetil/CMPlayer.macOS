@@ -4,7 +4,8 @@ import PackageDescription
         name: "CMPlayer",        
         defaultLocalization: "en",        
         products: [
-            .executable(name: "cmplayer", targets: ["CMPlayer"])
+            .executable(name: "cmplayer", targets: ["CMPlayer"]),
+            .executable(name: "cmpshim", targets: ["CMPShim"])
         ],    
         dependencies: [
             
@@ -13,7 +14,7 @@ import PackageDescription
             .executableTarget(
                 name: "CMPlayer",
                 dependencies: [                        
-                    //"Cmpg123",
+                    
                 ],
                 cSettings: [
                     .define("CMP_PLATFORM_ARM64"),
@@ -22,6 +23,18 @@ import PackageDescription
                 swiftSettings: [
                     .define("CMP_PLATFORM_ARM64"),
                     .define("CMP_TARGET_MACOS_V27")
+                ]
+            ),
+            .executableTarget(
+                name: "CMPShim",
+                dependencies: [                        
+                
+                ],
+                cSettings: [
+                    
+                ],
+                swiftSettings: [
+                    
                 ]
             ),
         ]        
